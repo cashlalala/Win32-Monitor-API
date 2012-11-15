@@ -1,8 +1,18 @@
 ﻿<Window x:Class="Win32MultiMonitorDemo.MainWindow"
         xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
         xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
-        Title="MainWindow" Height="350" Width="525">
-    <Grid>
-        
-    </Grid>
+        xmlns:mon="clr-namespace:Win32MultiMonitorDemo.Ctrl"
+        Title="MainWindow" Height="350" Width="525" Closed="Window_Closed" >
+    <DockPanel LastChildFill="False">
+        <ListView DockPanel.Dock="Top">
+            <mon:MonitorInfo x:Name="monInfo">
+
+            </mon:MonitorInfo>
+        </ListView>
+        <DockPanel LastChildFill="False" FlowDirection="RightToLeft" Margin="5" DockPanel.Dock="Bottom">
+            <Button>Stop Detecting</Button>
+            <Button>Start To Detect</Button>
+            <Button>Change the handling to .NET</Button>
+        </DockPanel>
+    </DockPanel>
 </Window>
