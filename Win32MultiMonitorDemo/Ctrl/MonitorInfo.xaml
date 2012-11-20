@@ -6,8 +6,7 @@
              mc:Ignorable="d" 
              d:DesignHeight="300" d:DesignWidth="300">
     <StackPanel>
-        <Canvas>
-            
+        <Canvas Name="pieceView">
         </Canvas>
         <Grid>
             <Grid.RowDefinitions>
@@ -15,11 +14,13 @@
                 <RowDefinition />
                 <RowDefinition />
                 <RowDefinition />
+                <RowDefinition />
             </Grid.RowDefinitions>
-            <TextBlock Grid.Row="0" Name="a1">A1</TextBlock>
-            <TextBlock Grid.Row="1" Name="a2">A2</TextBlock>
-            <TextBlock Grid.Row="2" Name="a3">A3</TextBlock>
-            <TextBlock Grid.Row="3" Name="a4">A4</TextBlock>
+            <TextBlock Grid.Row="0" Name="winLeftTopPointInMon"></TextBlock>
+            <TextBlock Grid.Row="1" Name="monWidthHeight"></TextBlock>
+            <TextBlock Grid.Row="2" Name="monitorNo"></TextBlock>
+            <TextBlock Grid.Row="3" Name="winLeftTopPoint"></TextBlock>
+            <TextBlock Grid.Row="4" Name="winWidthHeight"></TextBlock>
         </Grid>
     </StackPanel>
 </UserControl>

@@ -64,13 +64,33 @@ namespace Win32MultiMonitorDemo.Util
             }
         }
 
+        public sealed class SafeWindowStationHandle : SafeHandleZeroOrMinusOneIsInvalid
+        {
+            public SafeWindowStationHandle()
+                : base(true)
+            {
+            }
+
+            protected override bool ReleaseHandle()
+            {
+                return CloseWindowStation(handle);
+            }
+        }
+
+       [return: MarshalAs(UnmanagedType.Bool)]
+       [ReliabilityContract(Consistency.WillNotCorruptState, Cer.MayFail)]
+       [DllImport("user32", CharSet = CharSet.Unicode, SetLastError = true)]
+       public static extern bool CloseWindowStation(IntPtr hWinsta);
+
+
+
         [DllImport("kernel32", SetLastError = true)]
         [ReliabilityContract(Consistency.WillNotCorruptState, Cer.MayFail)]
         [return: MarshalAs(UnmanagedType.Bool)]
         private extern static bool CloseHandle(IntPtr handle);
 
 
-        public static class MultiMonitorHelper
+        public static class MultiMonitor
         {
             [StructLayout(LayoutKind.Sequential,CharSet=CharSet.Auto, Pack=4)]
             public class MONITORINFOEX { 
@@ -102,10 +122,10 @@ namespace Win32MultiMonitorDemo.Util
 
             [DllImport("User32.dll", SetLastError = true,CharSet=CharSet.Auto)]
             [return: MarshalAs(UnmanagedType.Bool)]
-            public static extern bool GetMonitorInfo(HandleRef hMonitor, [In, Out] Win32MultiMonitorDemo.Util.Win32.MultiMonitorHelper.MONITORINFOEX monitorInfo);
+            public static extern bool GetMonitorInfo(IntPtr hMonitor, [In, Out] Win32MultiMonitorDemo.Util.Win32.MultiMonitor.MONITORINFOEX monitorInfo);
 
             [DllImport("User32.dll", SetLastError = true)]
-            public static extern GeneralSafeHandle MonitorFromPoint(Win32MultiMonitorDemo.Util.Win32.MultiMonitorHelper.POINTSTRUCT pt, uint flags);
+            public static extern IntPtr MonitorFromPoint(Win32MultiMonitorDemo.Util.Win32.MultiMonitor.POINTSTRUCT pt, uint flags);
 
 
             /*
@@ -114,13 +134,28 @@ namespace Win32MultiMonitorDemo.Util
              * HandleRef can also be used here.
              */
             [DllImport("User32.dll",SetLastError=true)]
-            public static extern GeneralSafeHandle MonitorFromWindow(IntPtr hWnd, uint dwFlags);
+            public static extern IntPtr MonitorFromWindow(IntPtr hWnd, uint dwFlags);
 
 
             public const uint MONITOR_DEFAULTTONULL = 0;
             public const uint MONITOR_DEFAULTTOPRIMARY = 1;
             public const uint MONITOR_DEFAULTTONEAREST = 2;
         
+        }
+
+        public  static class Display
+        {
+            [DllImport("user32.dll",CharSet = CharSet.Auto, SetLastError=true)] public
+static extern bool EnumDesktops(IntPtr hwinsta, EnumDesktopsDelegate
+  lpEnumFunc, IntPtr lParam);
+
+            public delegate bool EnumDesktopsDelegate([MarshalAs(UnmanagedType.LPTStr)]string desktopName, int lParam);
+
+            [ReliabilityContract(Consistency.WillNotCorruptState, Cer.MayFail)]
+            [DllImport("user32", CharSet = CharSet.Unicode, SetLastError = true)]
+            public static extern SafeWindowStationHandle GetProcessWindowStation();
+
+
         }
 
 
