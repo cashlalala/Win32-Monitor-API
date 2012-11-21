@@ -74,9 +74,15 @@
     <Compile Include="Ctrl\MonitorInfo.xaml.cs">
       <DependentUpon>MonitorInfo.xaml</DependentUpon>
     </Compile>
+    <Compile Include="Model\Win32Monitor.cs" />
     <Compile Include="Util\Converters.cs" />
+    <Compile Include="Util\IMonitorManage.cs" />
+    <Compile Include="Model\Monitor.cs" />
+    <Compile Include="Util\MonitorManagerFactory.cs" />
     <Compile Include="Util\Win32.cs" />
     <Compile Include="Model\Win32StructWrapper.cs" />
+    <Compile Include="Util\Win32MonitorManager.cs" />
+    <Compile Include="Util\WPFMonitorManager.cs" />
     <Compile Include="ViewModels\ViewModel.cs" />
     <Page Include="Ctrl\MonitorInfo.xaml">
       <SubType>Designer</SubType>
@@ -113,6 +119,7 @@
       <Generator>ResXFileCodeGenerator</Generator>
       <LastGenOutput>Resources.Designer.cs</LastGenOutput>
     </EmbeddedResource>
+    <None Include="ClassDiagram1.cd" />
     <None Include="Properties\Settings.settings">
       <Generator>SettingsSingleFileGenerator</Generator>
       <LastGenOutput>Settings.Designer.cs</LastGenOutput>

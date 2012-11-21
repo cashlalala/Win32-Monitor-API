@@ -21,7 +21,7 @@
                 <RowDefinition />
                 <RowDefinition />
             </Grid.RowDefinitions>
-            <TextBlock Grid.Row="0" Name="winLeftTopPointInMon" ></TextBlock>
+            <TextBlock Grid.Row="0" Name="workRect" Text="{Binding Path=rcWrok, Converter={StaticResource int2RectConverter}}"></TextBlock>
             <TextBlock Grid.Row="1" Name="monRect" Text="{Binding Path=rcMonitor, Converter={StaticResource int2RectConverter}}"></TextBlock>
             <TextBlock Grid.Row="2" Name="monitorNo" Text="{Binding Path=szDevice, Converter={StaticResource charAry2StrConverter}}"></TextBlock>
             <TextBlock Grid.Row="3" Name="winLeftTopPoint"></TextBlock>

@@ -11,13 +11,13 @@ namespace Win32MultiMonitorDemo.Model
 {
     public class Win32StructWrapper
     {
-        public class MonitorInfoEx : Win32.MultiMonitor.MONITORINFOEX, INotifyPropertyChanged
+        public class MonitorInfoEx : Win32.CMonitor.MONITORINFOEX, INotifyPropertyChanged
         {
             public MonitorInfoEx()
                 : base()
             {}
 
-            public override int cbSize
+            public override int CbSize
             {
                 get { return _cbSize; }
                 set 
@@ -27,7 +27,7 @@ namespace Win32MultiMonitorDemo.Model
                 }
             }
 
-            public override Win32MultiMonitorDemo.Util.Win32.MultiMonitor.RECT rcMonitor
+            public override Win32MultiMonitorDemo.Util.Win32.CMonitor.RECT rcMonitor
             {
                 get { return _rcMonitor; }
                 set 
@@ -37,7 +37,7 @@ namespace Win32MultiMonitorDemo.Model
                 }
             }
 
-            public override Win32MultiMonitorDemo.Util.Win32.MultiMonitor.RECT rcWork
+            public override Win32MultiMonitorDemo.Util.Win32.CMonitor.RECT rcWork
             {
                 get { return _rcWork; }
                 set 
@@ -75,9 +75,9 @@ namespace Win32MultiMonitorDemo.Model
                     handler(this, new PropertyChangedEventArgs(property));
             }
 
-            public Win32MultiMonitorDemo.Util.Win32.MultiMonitor.MONITORINFOEX copy2Win32Struct(MonitorInfoEx monitorInfoEx)
+            public Win32MultiMonitorDemo.Util.Win32.CMonitor.MONITORINFOEX copy2Win32Struct(MonitorInfoEx monitorInfoEx)
             {
-                Win32MultiMonitorDemo.Util.Win32.MultiMonitor.MONITORINFOEX buf = new Win32MultiMonitorDemo.Util.Win32.MultiMonitor.MONITORINFOEX();
+                Win32MultiMonitorDemo.Util.Win32.CMonitor.MONITORINFOEX buf = new Win32MultiMonitorDemo.Util.Win32.CMonitor.MONITORINFOEX();
                 foreach (PropertyInfo propInfo in monitorInfoEx.GetType().GetProperties())
                 {
                     foreach (PropertyInfo propInfoInBuf in buf.GetType().GetProperties())
@@ -89,7 +89,7 @@ namespace Win32MultiMonitorDemo.Model
                 return buf;
             }
 
-            public void copyFromWin32Struct(Win32MultiMonitorDemo.Util.Win32.MultiMonitor.MONITORINFOEX monitorInfoEx)
+            public void copyFromWin32Struct(Win32MultiMonitorDemo.Util.Win32.CMonitor.MONITORINFOEX monitorInfoEx)
             {
                 foreach (PropertyInfo propInfo in monitorInfoEx.GetType().GetProperties())
                 {

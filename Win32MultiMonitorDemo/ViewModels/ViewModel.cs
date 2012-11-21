@@ -1,114 +1,90 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Windows.Threading;
-using System.Windows.Interop;
-using System.Windows.Input;
-using Win32MultiMonitorDemo.Util;
 using System.Runtime.InteropServices;
 using System.Windows;
+using System.Windows.Input;
+using System.Windows.Interop;
+using System.Windows.Threading;
 using Win32MultiMonitorDemo.Command;
 using Win32MultiMonitorDemo.Model;
+using Win32MultiMonitorDemo.Util;
 
 namespace Win32MultiMonitorDemo.ViewModels
 {
     public class ViewModel
     {
-#region Field
-        private DispatcherTimer dispatchTimer;
-        
-        private ICommand startDetectCmd;
+        #region Field
 
-        private ICommand stopDetectCmd;
+        private readonly DispatcherTimer _dispatchTimer;
+        private readonly WindowInteropHelper _winInterOpHelper;
+        private IDetectMonitor _detectMonitor;
 
-        private ICommand swithMachenismCmd;
+        private ICommand _startDetectCmd;
 
-        private IDetectMonitor detectMonitor;
+        private ICommand _stopDetectCmd;
 
-        private Dictionary<DetectMethod, IDetectMonitor> detectMonitorMap;
+        private ICommand _swithMachenismCmd;
 
-        private WindowInteropHelper winInterOpHelper;
+        #endregion
 
-        private Win32StructWrapper.MonitorInfoEx model;
+        #region Contructor
 
-#endregion
-
-#region Contructor
-        public ViewModel(MainWindow mainWin)
+        public ViewModel(Window mainWin)
         {
-            this.dispatchTimer = new DispatcherTimer(new TimeSpan(0, 0, 1), DispatcherPriority.Normal, this.OnDispatcherTimer, mainWin.Dispatcher);
-            this.dispatchTimer.Stop();
+            _dispatchTimer = new DispatcherTimer(new TimeSpan(0, 0, 5), DispatcherPriority.Normal, OnDispatcherTimer,
+                                                 mainWin.Dispatcher);
+            _dispatchTimer.Stop();
 
-            detectMonitorMap = new Dictionary<DetectMethod, IDetectMonitor>();
-            detectMonitorMap.Add(DetectMethod.win32, new Win32Monitor());
-            detectMonitorMap.Add(DetectMethod.wpf, new WPFmonitor());
+            DetectMonitorMap = new Dictionary<DetectMethod, IDetectMonitor>
+                {
+                    {DetectMethod.Win32, new Win32Monitor()},
+                    {DetectMethod.Wpf, new WpFmonitor()}
+                };
 
-            this.detectMonitor = detectMonitorMap[DetectMethod.win32];
+            _detectMonitor = DetectMonitorMap[DetectMethod.Win32];
 
-            this.winInterOpHelper = new WindowInteropHelper(mainWin);
+            _winInterOpHelper = new WindowInteropHelper(mainWin);
 
-            this.model = new Win32StructWrapper.MonitorInfoEx();
+            Model = new Win32StructWrapper.MonitorInfoEx();
         }
-#endregion
 
-#region Property
-        public Win32StructWrapper.MonitorInfoEx Model
-        {
-            get { return model; }
-            set { model = value; }
-        }
-        public Dictionary<DetectMethod, IDetectMonitor> DetectMonitorMap
-        {
-            get { return detectMonitorMap; }
-            set { detectMonitorMap = value; }
-        }
+        #endregion
+
+        #region Property
+
+        public Win32StructWrapper.MonitorInfoEx Model { get; set; }
+
+        public Dictionary<DetectMethod, IDetectMonitor> DetectMonitorMap { get; set; }
 
         public ICommand SwithMachenismCmd
         {
-            get
-            {
-                if (this.swithMachenismCmd == null)
-                    this.swithMachenismCmd = new RelayCommand(SwitchDetectMachenism);
-                return swithMachenismCmd;
-            }
-            set { swithMachenismCmd = value; }
+            get { return _swithMachenismCmd ?? (_swithMachenismCmd = new RelayCommand(SwitchDetectMachenism)); }
+            set { _swithMachenismCmd = value; }
         }
 
         public ICommand StartDetectCmd
         {
-            get
-            {
-                if (this.startDetectCmd == null)
-                    this.startDetectCmd = new RelayCommand(StartDetect);
-                return startDetectCmd;
-            }
-            set { startDetectCmd = value; }
+            get { return _startDetectCmd ?? (_startDetectCmd = new RelayCommand(StartDetect)); }
+            set { _startDetectCmd = value; }
         }
 
         public ICommand StopDetectCmd
         {
-            get
-            {
-                if (this.stopDetectCmd == null)
-                    this.stopDetectCmd = new RelayCommand(StopDect);
-                return stopDetectCmd;
-            }
-            set { stopDetectCmd = value; }
+            get { return _stopDetectCmd ?? (_stopDetectCmd = new RelayCommand(StopDect)); }
+            set { _stopDetectCmd = value; }
         }
 
+        #endregion
 
-#endregion
+        #region Class
 
-
-#region Class
         private class Win32Monitor : IDetectMonitor
         {
             public void Detect(object param)
             {
-                ViewModel viewModel = (ViewModel)Convert.ChangeType(param, typeof(ViewModel));
+                var viewModel = (ViewModel) Convert.ChangeType(param, typeof (ViewModel));
 
-                Win32.MultiMonitor.MONITORINFOEX monInfoEx = new Win32.MultiMonitor.MONITORINFOEX();
+                var monInfoEx = new Win32.CMonitor.MONITORINFOEX();
 
                 /*
                  * Get the monitor info from point
@@ -120,9 +96,10 @@ namespace Win32MultiMonitorDemo.ViewModels
                 /*
                  * Get the monitor info from window 
                  */
-                IntPtr hMonFromWin = Win32.MultiMonitor.MonitorFromWindow(viewModel.winInterOpHelper.Handle, Win32.MultiMonitor.MONITOR_DEFAULTTONEAREST);
+                IntPtr hMonFromWin = Win32.CMonitor.MonitorFromWindow(viewModel._winInterOpHelper.Handle,
+                                                                      Win32.CMonitor.MONITOR_DEFAULTTONULL);
 
-                bool result = Win32.MultiMonitor.GetMonitorInfo(hMonFromWin, monInfoEx);
+                bool result = Win32.CMonitor.GetMonitorInfo(hMonFromWin, monInfoEx);
 
                 if (result)
                     viewModel.Model.copyFromWin32Struct(monInfoEx);
@@ -135,78 +112,64 @@ namespace Win32MultiMonitorDemo.ViewModels
             //    //this.monInfo.monWidthHeight.Text = String.Format("DesktopName: {0:},\t lParam: {1}\r\n", desktopName, lParam);
             //    return true;
             //}
-            
-            public Win32Monitor()
-            {
-                // TODO: Complete member initialization
-            }
         }
 
-        public class WPFmonitor : IDetectMonitor
+        private class WpFmonitor : IDetectMonitor
         {
-
             public void Detect(object param)
             {
                 Console.WriteLine("QQorz");
             }
-
-            public WPFmonitor()
-            {
-
-            }
         }
-#endregion
 
-#region Methods
+        #endregion
+
+        #region Methods
 
         private void OnDispatcherTimer(object sender, EventArgs e)
         {
-            this.detectMonitor.Detect(this);
+            _detectMonitor.Detect(this);
         }
 
-
-        private void Window_Closed(object sender, EventArgs e)
-        {
-            if (this.dispatchTimer.IsEnabled)
-            {
-                this.dispatchTimer.Stop();
-            }
-        }
 
         private void StartDetect(object param)
         {
-            this.dispatchTimer.Start();
+            _dispatchTimer.Start();
         }
 
         private void StopDect(object param)
         {
-            this.dispatchTimer.Stop();
+            _dispatchTimer.Stop();
         }
 
         private void SwitchDetectMachenism(object param)
         {
-            ViewModel viewModel = (ViewModel)Convert.ChangeType(param, typeof(ViewModel));
-            if (viewModel.detectMonitor is Win32Monitor)
-                viewModel.detectMonitor = viewModel.detectMonitorMap[DetectMethod.wpf];
+            var viewModel = (ViewModel) Convert.ChangeType(param, typeof (ViewModel));
+            if (viewModel._detectMonitor is Win32Monitor)
+                viewModel._detectMonitor = viewModel.DetectMonitorMap[DetectMethod.Wpf];
             else
-                viewModel.detectMonitor = viewModel.detectMonitorMap[DetectMethod.win32];
+                viewModel._detectMonitor = viewModel.DetectMonitorMap[DetectMethod.Win32];
         }
-#endregion
 
-#region Interface
+        #endregion
+
+        #region Interface
+
         public interface IDetectMonitor
         {
             void Detect(object param);
         }
 
-#endregion
+        #endregion
 
-#region Enum
+        #region Enum
+
         public enum DetectMethod
         {
-            win32 = 0,
-            wpf = 1
+            Win32 = 0,
+            Wpf = 1
         };
-#endregion
+
+        #endregion
     }
 }

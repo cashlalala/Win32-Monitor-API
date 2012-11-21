@@ -1,11 +1,7 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
 using System.Runtime.InteropServices;
 using System.Runtime.ConstrainedExecution;
 using Microsoft.Win32.SafeHandles;
-using System.ComponentModel;
 
 namespace Win32MultiMonitorDemo.Util
 {
@@ -13,13 +9,6 @@ namespace Win32MultiMonitorDemo.Util
     {
         public class GeneralSafeHandle : SafeHandle
         {
-
-            private GeneralSafeHandle()
-                : base(IntPtr.Zero, //invalid value
-                         true)           //is released at the end of SafeHandle
-            {
-            }
-
             public GeneralSafeHandle(IntPtr hHandle)
                 : base(IntPtr.Zero,true)
             {
@@ -35,7 +24,7 @@ namespace Win32MultiMonitorDemo.Util
                 // or during testing to diagnose handle corruption problems.
                 // We do not throw an exception because most code could not recover
                 // from the problem.
-                return Win32.CloseHandle(this.handle);
+                return CloseHandle(handle);
             }
 
             public static implicit operator IntPtr (GeneralSafeHandle generalSafeHandle)
@@ -91,19 +80,20 @@ namespace Win32MultiMonitorDemo.Util
         private extern static bool CloseHandle(IntPtr handle);
 
 
-        public static class MultiMonitor
+        public static class CMonitor
         {
-            [StructLayout(LayoutKind.Sequential,CharSet=CharSet.Auto, Pack=4)]
-            public class MONITORINFOEX 
+#region Structure
+            [StructLayout(LayoutKind.Sequential, CharSet = CharSet.Auto, Pack = 4)]
+            public class MONITORINFOEX
             {
                 protected int _cbSize = Marshal.SizeOf(typeof(MONITORINFOEX));
                 protected RECT _rcMonitor = new RECT();
                 protected RECT _rcWork = new RECT();
                 protected int _dwFlags = 0;
-                [MarshalAs(UnmanagedType.ByValArray, SizeConst=32)]
+                [MarshalAs(UnmanagedType.ByValArray, SizeConst = 32)]
                 protected char[] _szDevice = new char[32];
 
-                public virtual int cbSize
+                public virtual int CbSize
                 {
                     get { return _cbSize; }
                     set { _cbSize = value; }
@@ -136,40 +126,45 @@ namespace Win32MultiMonitorDemo.Util
             }
 
             [StructLayout(LayoutKind.Sequential)]
-            public struct POINTSTRUCT { 
+            public struct POINTSTRUCT
+            {
                 public int x;
                 public int y;
-                public POINTSTRUCT(int x, int y) {
-                  this.x = x; 
-                  this.y = y;
-                } 
-            } 
+                public POINTSTRUCT(int x, int y)
+                {
+                    this.x = x;
+                    this.y = y;
+                }
+            }
 
-            [StructLayout(LayoutKind.Sequential)] 
-            public struct RECT {
-                public int left; 
-                public int top; 
+            [StructLayout(LayoutKind.Sequential)]
+            public struct RECT
+            {
+                public int left;
+                public int top;
                 public int right;
                 public int bottom;
-                public RECT(int l,int t, int r, int b)
+                public RECT(int l, int t, int r, int b)
                 {
                     left = l;
-                    top = t; 
+                    top = t;
                     right = r;
                     bottom = b;
                 }
                 public override string ToString()
                 {
-                    return String.Format("left: {0}, top: {1}, right: {2}, buttom: {3}",left,top, right, bottom);
+                    return String.Format("left: {0}, top: {1}, right: {2}, buttom: {3}", left, top, right, bottom);
                 }
             }
+#endregion
+
 
             [DllImport("User32.dll", SetLastError = true,CharSet=CharSet.Auto)]
             [return: MarshalAs(UnmanagedType.Bool)]
-            public static extern bool GetMonitorInfo(IntPtr hMonitor, [In, Out] Win32MultiMonitorDemo.Util.Win32.MultiMonitor.MONITORINFOEX monitorInfo);
+            public static extern bool GetMonitorInfo(IntPtr hMonitor, [In, Out] Win32MultiMonitorDemo.Util.Win32.CMonitor.MONITORINFOEX monitorInfo);
 
             [DllImport("User32.dll", SetLastError = true)]
-            public static extern IntPtr MonitorFromPoint(Win32MultiMonitorDemo.Util.Win32.MultiMonitor.POINTSTRUCT pt, uint flags);
+            public static extern IntPtr MonitorFromPoint(Win32MultiMonitorDemo.Util.Win32.CMonitor.POINTSTRUCT pt, uint flags);
 
 
             /*
@@ -180,26 +175,27 @@ namespace Win32MultiMonitorDemo.Util
             [DllImport("User32.dll",SetLastError=true)]
             public static extern IntPtr MonitorFromWindow(IntPtr hWnd, uint dwFlags);
 
-
+#region Define MACRO
             public const uint MONITOR_DEFAULTTONULL = 0;
             public const uint MONITOR_DEFAULTTOPRIMARY = 1;
             public const uint MONITOR_DEFAULTTONEAREST = 2;
-        
-        }
+#endregion
 
-        public  static class Display
-        {
-            [DllImport("user32.dll",CharSet = CharSet.Auto, SetLastError=true)] public
-static extern bool EnumDesktops(IntPtr hwinsta, EnumDesktopsDelegate
-  lpEnumFunc, IntPtr lParam);
+            [DllImport("user32.dll", SetLastError=true)]
+            public static extern bool EnumDisplayMonitors(IntPtr hdc, IntPtr lprcClip, EnumMonitorsDelegate lpfnEnum, int dwData);
+
+            public delegate bool EnumMonitorsDelegate(IntPtr hMonitor, IntPtr hdcMonitor, IntPtr lprcMonitor, int dwData);
+
+            [DllImport("user32.dll", CharSet = CharSet.Auto, SetLastError = true)]
+            public static extern bool EnumDesktops(IntPtr hwinsta, EnumDesktopsDelegate
+                lpEnumFunc, IntPtr lParam);
 
             public delegate bool EnumDesktopsDelegate([MarshalAs(UnmanagedType.LPTStr)]string desktopName, int lParam);
 
             [ReliabilityContract(Consistency.WillNotCorruptState, Cer.MayFail)]
             [DllImport("user32", CharSet = CharSet.Unicode, SetLastError = true)]
             public static extern SafeWindowStationHandle GetProcessWindowStation();
-
-
+        
         }
 
 

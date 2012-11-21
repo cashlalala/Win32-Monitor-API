@@ -30,9 +30,9 @@ namespace Win32MultiMonitorDemo.Util
 
         public object Convert(object value, Type targetType, object parameter, System.Globalization.CultureInfo culture)
         {
-            if (value is Win32MultiMonitorDemo.Util.Win32.MultiMonitor.RECT)
+            if (value is Win32MultiMonitorDemo.Util.Win32.CMonitor.RECT)
             {
-                value = (Win32MultiMonitorDemo.Util.Win32.MultiMonitor.RECT) value;
+                value = (Win32MultiMonitorDemo.Util.Win32.CMonitor.RECT) value;
                 return value.ToString();
             }  
             else
@@ -46,7 +46,7 @@ namespace Win32MultiMonitorDemo.Util
                 String[] result = (value as String).Split(new char[] {',',' ','\0',':',
                                                                                             'a','b','c','d','e','f','g','h','i','j','k','l','m','n','o','p','q','r','s','t','u','v','w','x','y','z',
                                                                                             'A','B','C','D','E','F','G','H','I','J','K','L','M','N','O','P','Q','R','S','T','U','V','W','X','Y','Z'});
-                Win32MultiMonitorDemo.Util.Win32.MultiMonitor.RECT rect = new Win32MultiMonitorDemo.Util.Win32.MultiMonitor.RECT();
+                Win32MultiMonitorDemo.Util.Win32.CMonitor.RECT rect = new Win32MultiMonitorDemo.Util.Win32.CMonitor.RECT();
                 rect.left = int.Parse(result[0]);
                 rect.top = int.Parse(result[1]);
                 rect.right = int.Parse(result[2]);
@@ -55,7 +55,7 @@ namespace Win32MultiMonitorDemo.Util
             }  
             else
             {
-                return new Win32MultiMonitorDemo.Util.Win32.MultiMonitor.RECT();
+                return new Win32MultiMonitorDemo.Util.Win32.CMonitor.RECT();
             }
                 
         }
