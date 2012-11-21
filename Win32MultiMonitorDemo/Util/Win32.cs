@@ -5,6 +5,7 @@ using System.Text;
 using System.Runtime.InteropServices;
 using System.Runtime.ConstrainedExecution;
 using Microsoft.Win32.SafeHandles;
+using System.ComponentModel;
 
 namespace Win32MultiMonitorDemo.Util
 {
@@ -93,13 +94,45 @@ namespace Win32MultiMonitorDemo.Util
         public static class MultiMonitor
         {
             [StructLayout(LayoutKind.Sequential,CharSet=CharSet.Auto, Pack=4)]
-            public class MONITORINFOEX { 
-                public int     cbSize = Marshal.SizeOf(typeof(MONITORINFOEX));
-                public RECT    rcMonitor = new RECT(); 
-                public RECT    rcWork = new RECT(); 
-                public int     dwFlags = 0;
-                [MarshalAs(UnmanagedType.ByValArray, SizeConst=32)] 
-                public char[]  szDevice = new char[32];
+            public class MONITORINFOEX 
+            {
+                protected int _cbSize = Marshal.SizeOf(typeof(MONITORINFOEX));
+                protected RECT _rcMonitor = new RECT();
+                protected RECT _rcWork = new RECT();
+                protected int _dwFlags = 0;
+                [MarshalAs(UnmanagedType.ByValArray, SizeConst=32)]
+                protected char[] _szDevice = new char[32];
+
+                public virtual int cbSize
+                {
+                    get { return _cbSize; }
+                    set { _cbSize = value; }
+                }
+
+                public virtual RECT rcMonitor
+                {
+                    get { return _rcMonitor; }
+                    set { _rcMonitor = value; }
+                }
+
+                public virtual RECT rcWork
+                {
+                    get { return _rcWork; }
+                    set { _rcWork = value; }
+                }
+
+                public virtual int dwFlags
+                {
+                    get { return _dwFlags; }
+                    set { _dwFlags = value; }
+                }
+
+                public virtual char[] szDevice
+                {
+                    get { return _szDevice; }
+                    set { _szDevice = value; }
+                }
+
             }
 
             [StructLayout(LayoutKind.Sequential)]
@@ -117,7 +150,18 @@ namespace Win32MultiMonitorDemo.Util
                 public int left; 
                 public int top; 
                 public int right;
-                public int bottom; 
+                public int bottom;
+                public RECT(int l,int t, int r, int b)
+                {
+                    left = l;
+                    top = t; 
+                    right = r;
+                    bottom = b;
+                }
+                public override string ToString()
+                {
+                    return String.Format("left: {0}, top: {1}, right: {2}, buttom: {3}",left,top, right, bottom);
+                }
             }
 
             [DllImport("User32.dll", SetLastError = true,CharSet=CharSet.Auto)]

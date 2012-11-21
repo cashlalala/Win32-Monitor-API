@@ -3,8 +3,13 @@
              xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
              xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
              xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
+             xmlns:util="clr-namespace:Win32MultiMonitorDemo.Util"
              mc:Ignorable="d" 
              d:DesignHeight="300" d:DesignWidth="300">
+    <UserControl.Resources>
+        <util:CharAryToStringConverter x:Key="charAry2StrConverter"/>
+        <util:Int2RectConverter x:Key="int2RectConverter"/>
+    </UserControl.Resources>
     <StackPanel>
         <Canvas Name="pieceView">
         </Canvas>
@@ -16,9 +21,9 @@
                 <RowDefinition />
                 <RowDefinition />
             </Grid.RowDefinitions>
-            <TextBlock Grid.Row="0" Name="winLeftTopPointInMon"></TextBlock>
-            <TextBlock Grid.Row="1" Name="monWidthHeight"></TextBlock>
-            <TextBlock Grid.Row="2" Name="monitorNo"></TextBlock>
+            <TextBlock Grid.Row="0" Name="winLeftTopPointInMon" ></TextBlock>
+            <TextBlock Grid.Row="1" Name="monRect" Text="{Binding Path=rcMonitor, Converter={StaticResource int2RectConverter}}"></TextBlock>
+            <TextBlock Grid.Row="2" Name="monitorNo" Text="{Binding Path=szDevice, Converter={StaticResource charAry2StrConverter}}"></TextBlock>
             <TextBlock Grid.Row="3" Name="winLeftTopPoint"></TextBlock>
             <TextBlock Grid.Row="4" Name="winWidthHeight"></TextBlock>
         </Grid>

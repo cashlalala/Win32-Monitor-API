@@ -2,15 +2,15 @@
         xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
         xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
         xmlns:mon="clr-namespace:Win32MultiMonitorDemo.Ctrl"
-        Title="MainWindow" Height="350" Width="525" Closed="Window_Closed" Name="MainWin">
+        Title="MainWindow" Height="350" Width="525" Name="MainWin">
     <DockPanel LastChildFill="False">
         <ListView DockPanel.Dock="Top">
-            <mon:MonitorInfo x:Name="monInfo"></mon:MonitorInfo>
+            <mon:MonitorInfo x:Name="monInfo" DataContext="{Binding Path=Model}"></mon:MonitorInfo>
         </ListView>
         <DockPanel LastChildFill="False" FlowDirection="RightToLeft" Margin="5" DockPanel.Dock="Bottom">
-            <Button Name="Stop" Command="{Binding Path=StopDetectCmd, ElementName=MainWin}">Stop Detecting</Button>
-            <Button Name="Start" Command="{Binding Path=StartDetectCmd,  ElementName=MainWin}" CommandParameter="{Binding ElementName=MainWin}">Start To Detect</Button>
-            <Button Name="Switch" Command="{Binding Path=SwithMachenismCmd, ElementName=MainWin}" CommandParameter="{Binding ElementName=MainWin}">
+            <Button Name="Stop" Command="{Binding Path=StopDetectCmd}">Stop Detecting</Button>
+            <Button Name="Start" Command="{Binding Path=StartDetectCmd}" CommandParameter="{Binding}">Start To Detect</Button>
+            <Button Name="Switch" Command="{Binding Path=SwithMachenismCmd}" CommandParameter="{Binding}">
                 Change the machenism to .NET
             </Button>
         </DockPanel>

@@ -74,7 +74,10 @@
     <Compile Include="Ctrl\MonitorInfo.xaml.cs">
       <DependentUpon>MonitorInfo.xaml</DependentUpon>
     </Compile>
+    <Compile Include="Util\Converters.cs" />
     <Compile Include="Util\Win32.cs" />
+    <Compile Include="Model\Win32StructWrapper.cs" />
+    <Compile Include="ViewModels\ViewModel.cs" />
     <Page Include="Ctrl\MonitorInfo.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
@@ -138,6 +141,7 @@
       <Install>true</Install>
     </BootstrapperPackage>
   </ItemGroup>
+  <ItemGroup />
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 
        Other similar extension points exist, see Microsoft.Common.targets.
