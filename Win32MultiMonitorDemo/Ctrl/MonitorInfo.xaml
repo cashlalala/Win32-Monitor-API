@@ -7,11 +7,11 @@
              mc:Ignorable="d" 
              d:DesignHeight="300" d:DesignWidth="300">
     <UserControl.Resources>
-        <util:CharAryToStringConverter x:Key="charAry2StrConverter"/>
-        <util:Int2RectConverter x:Key="int2RectConverter"/>
+        <util:CharAryToStringConverter x:Key="CharAry2StrConverter"/>
+        <util:Int2RectConverter x:Key="Int2RectConverter"/>
     </UserControl.Resources>
     <StackPanel>
-        <Canvas Name="pieceView">
+        <Canvas Name="PieceView">
         </Canvas>
         <Grid>
             <Grid.RowDefinitions>
@@ -21,11 +21,11 @@
                 <RowDefinition />
                 <RowDefinition />
             </Grid.RowDefinitions>
-            <TextBlock Grid.Row="0" Name="workRect" Text="{Binding Path=rcWrok, Converter={StaticResource int2RectConverter}}"></TextBlock>
-            <TextBlock Grid.Row="1" Name="monRect" Text="{Binding Path=rcMonitor, Converter={StaticResource int2RectConverter}}"></TextBlock>
-            <TextBlock Grid.Row="2" Name="monitorNo" Text="{Binding Path=szDevice, Converter={StaticResource charAry2StrConverter}}"></TextBlock>
-            <TextBlock Grid.Row="3" Name="winLeftTopPoint"></TextBlock>
-            <TextBlock Grid.Row="4" Name="winWidthHeight"></TextBlock>
+            <TextBlock Grid.Row="0" Name="WorkRect" Text="{Binding Path=WorkRect, Converter={StaticResource Int2RectConverter}}"></TextBlock>
+            <TextBlock Grid.Row="1" Name="MonRect" Text="{Binding Path=MonitorRect, Converter={StaticResource Int2RectConverter}}"></TextBlock>
+            <TextBlock Grid.Row="2" Name="MonitorNo" Text="{Binding Path=Name}"></TextBlock>
+            <TextBlock Grid.Row="3" Name="WinLeftTopPoint"></TextBlock>
+            <TextBlock Grid.Row="4" Name="WinWidthHeight"></TextBlock>
         </Grid>
     </StackPanel>
 </UserControl>

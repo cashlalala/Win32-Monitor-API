@@ -51,8 +51,12 @@
     <WarningLevel>4</WarningLevel>
   </PropertyGroup>
   <ItemGroup>
+    <Reference Include="log4net">
+      <HintPath>packages\log4net.2.0.0\lib\net40-client\log4net.dll</HintPath>
+    </Reference>
     <Reference Include="System" />
     <Reference Include="System.Data" />
+    <Reference Include="System.Windows.Forms" />
     <Reference Include="System.Xml" />
     <Reference Include="Microsoft.CSharp" />
     <Reference Include="System.Core" />
@@ -75,12 +79,14 @@
       <DependentUpon>MonitorInfo.xaml</DependentUpon>
     </Compile>
     <Compile Include="Model\Win32Monitor.cs" />
+    <Compile Include="Model\WpfMonitor.cs" />
     <Compile Include="Util\Converters.cs" />
-    <Compile Include="Util\IMonitorManage.cs" />
+    <Compile Include="Util\DeviceDetector.cs" />
+    <Compile Include="Util\GeneralSafeHandle.cs" />
+    <Compile Include="Util\IMonitorManager.cs" />
     <Compile Include="Model\Monitor.cs" />
     <Compile Include="Util\MonitorManagerFactory.cs" />
-    <Compile Include="Util\Win32.cs" />
-    <Compile Include="Model\Win32StructWrapper.cs" />
+    <Compile Include="Util\Win32Wrapper.cs" />
     <Compile Include="Util\Win32MonitorManager.cs" />
     <Compile Include="Util\WPFMonitorManager.cs" />
     <Compile Include="ViewModels\ViewModel.cs" />
@@ -120,6 +126,10 @@
       <LastGenOutput>Resources.Designer.cs</LastGenOutput>
     </EmbeddedResource>
     <None Include="ClassDiagram1.cd" />
+    <Content Include="log4net.xml">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <None Include="packages.config" />
     <None Include="Properties\Settings.settings">
       <Generator>SettingsSingleFileGenerator</Generator>
       <LastGenOutput>Settings.Designer.cs</LastGenOutput>

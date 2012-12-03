@@ -7,10 +7,14 @@ namespace Win32MultiMonitorDemo.Util
     {
         public static IMonitorManager GetInstance(ManagerType managerType = ManagerType.Win32, Object parameter = null)
         {
-            IMonitorManager manager = MonitorManagerMap[managerType];
-            if (manager == null)
+            IMonitorManager manager = null;
+            try
             {
-                manager = (IMonitorManager) Activator.CreateInstance(ManagerTypeRecord[managerType], parameter);
+                manager = MonitorManagerMap[managerType];
+            }
+            catch (Exception)
+            {
+                manager = (IMonitorManager)Activator.CreateInstance(ManagerTypeRecord[managerType], parameter);
                 MonitorManagerMap.Add(managerType, manager);
             }
             return manager;

@@ -1,12 +1,11 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Runtime.InteropServices;
+using System.ComponentModel;
 using System.Windows;
 using System.Windows.Input;
 using System.Windows.Interop;
 using System.Windows.Threading;
 using Win32MultiMonitorDemo.Command;
-using Win32MultiMonitorDemo.Model;
 using Win32MultiMonitorDemo.Util;
 
 namespace Win32MultiMonitorDemo.ViewModels
@@ -16,14 +15,16 @@ namespace Win32MultiMonitorDemo.ViewModels
         #region Field
 
         private readonly DispatcherTimer _dispatchTimer;
-        private readonly WindowInteropHelper _winInterOpHelper;
-        private IDetectMonitor _detectMonitor;
 
         private ICommand _startDetectCmd;
 
         private ICommand _stopDetectCmd;
 
         private ICommand _swithMachenismCmd;
+
+        private IMonitorManager _monitorManager;
+
+        private DeviceDetector _deviceDetector;
 
         #endregion
 
@@ -33,28 +34,39 @@ namespace Win32MultiMonitorDemo.ViewModels
         {
             _dispatchTimer = new DispatcherTimer(new TimeSpan(0, 0, 5), DispatcherPriority.Normal, OnDispatcherTimer,
                                                  mainWin.Dispatcher);
-            _dispatchTimer.Stop();
+            _dispatchTimer.Stop();;
 
-            DetectMonitorMap = new Dictionary<DetectMethod, IDetectMonitor>
-                {
-                    {DetectMethod.Win32, new Win32Monitor()},
-                    {DetectMethod.Wpf, new WpFmonitor()}
-                };
+            try
+            {
+                _monitorManager = MonitorManagerFactory.GetInstance();
 
-            _detectMonitor = DetectMonitorMap[DetectMethod.Win32];
+                _monitorManager.UpdateMonitors(null);
 
-            _winInterOpHelper = new WindowInteropHelper(mainWin);
+                _deviceDetector = DeviceDetector.GetInstance();
 
-            Model = new Win32StructWrapper.MonitorInfoEx();
+                _deviceDetector.DeviceAttached += this.OnDeviceNotify;
+                _deviceDetector.DeviceRemoved += this.OnDeviceNotify;
+            }
+            catch (Win32Exception win32Exception)
+            {
+                MessageBox.Show(String.Format("{0} \n StackTrace: \n{1}", win32Exception.Message, win32Exception.StackTrace),
+                                             win32Exception.ErrorCode.ToString());
+            }
+            catch (System.TypeLoadException ex)
+            {
+                MessageBox.Show(ex.Message);
+            }
         }
 
         #endregion
 
         #region Property
 
-        public Win32StructWrapper.MonitorInfoEx Model { get; set; }
-
-        public Dictionary<DetectMethod, IDetectMonitor> DetectMonitorMap { get; set; }
+        public DeviceDetector DeviceDetector
+        {
+            get { return _deviceDetector; }
+            set { _deviceDetector = value; }
+        }
 
         public ICommand SwithMachenismCmd
         {
@@ -74,61 +86,42 @@ namespace Win32MultiMonitorDemo.ViewModels
             set { _stopDetectCmd = value; }
         }
 
-        #endregion
-
-        #region Class
-
-        private class Win32Monitor : IDetectMonitor
+        public IMonitorManager MonitorManager
         {
-            public void Detect(object param)
-            {
-                var viewModel = (ViewModel) Convert.ChangeType(param, typeof (ViewModel));
-
-                var monInfoEx = new Win32.CMonitor.MONITORINFOEX();
-
-                /*
-                 * Get the monitor info from point
-                 */
-                //Win32.MultiMonitorHelper.POINTSTRUCT pt = new Win32.MultiMonitorHelper.POINTSTRUCT(2000, 500);
-                //Win32.GeneralSafeHandle hMon = Win32.MultiMonitorHelper.MonitorFromPoint(pt, Win32.MultiMonitorHelper.MONITOR_DEFAULTTONEAREST);
-                //bool result = Win32.MultiMonitorHelper.GetMonitorInfo(hMon, monInfoEx);
-
-                /*
-                 * Get the monitor info from window 
-                 */
-                IntPtr hMonFromWin = Win32.CMonitor.MonitorFromWindow(viewModel._winInterOpHelper.Handle,
-                                                                      Win32.CMonitor.MONITOR_DEFAULTTONULL);
-
-                bool result = Win32.CMonitor.GetMonitorInfo(hMonFromWin, monInfoEx);
-
-                if (result)
-                    viewModel.Model.copyFromWin32Struct(monInfoEx);
-                else
-                    MessageBox.Show(String.Format("Get error code: {0}", Marshal.GetLastWin32Error()));
-            }
-
-            //private static bool enumDesktop(string desktopName, int lParam)
-            //{
-            //    //this.monInfo.monWidthHeight.Text = String.Format("DesktopName: {0:},\t lParam: {1}\r\n", desktopName, lParam);
-            //    return true;
-            //}
+            get { return _monitorManager; }
+            set { _monitorManager = value; }
         }
 
-        private class WpFmonitor : IDetectMonitor
-        {
-            public void Detect(object param)
-            {
-                Console.WriteLine("QQorz");
-            }
-        }
 
         #endregion
 
         #region Methods
 
+        private void OnDeviceNotify(object sender, DeviceDetector.DeviceChangedEventArgs e)
+        {
+            try
+            {
+                var deviceInfo = e.DeviceInfo as Win32Wrapper.CTypes.DEV_BROADCAST_DEVICEINTERFACE;
+                if (deviceInfo != null)
+                {
+                    Guid deviceGuid = new Guid(deviceInfo.dbcc_classguid);
+                    Guid monitorInterfaceGuid = new Guid("E6F07B5F-EE97-4a90-B076-33F57BF4EAA7");
+                    if (deviceGuid.Equals(monitorInterfaceGuid))
+                        _monitorManager.UpdateMonitors(null);
+                }
+            }
+            catch (Win32Exception ex)
+            {
+                MessageBox.Show(ex.Message, ex.ErrorCode.ToString());
+            }
+
+            
+        }
+
+
         private void OnDispatcherTimer(object sender, EventArgs e)
         {
-            _detectMonitor.Detect(this);
+            //_monitorManager.UpdateMonitors(null);
         }
 
 
@@ -142,34 +135,21 @@ namespace Win32MultiMonitorDemo.ViewModels
             _dispatchTimer.Stop();
         }
 
+        public void OnHandleUpdated(object sender, EventArgs e)
+        {
+            DeviceDetector.ConfigTargetWindow(sender as Window);
+        }
+
         private void SwitchDetectMachenism(object param)
         {
             var viewModel = (ViewModel) Convert.ChangeType(param, typeof (ViewModel));
-            if (viewModel._detectMonitor is Win32Monitor)
-                viewModel._detectMonitor = viewModel.DetectMonitorMap[DetectMethod.Wpf];
+            if (viewModel.MonitorManager is Win32MonitorManager)
+                viewModel.MonitorManager = MonitorManagerFactory.GetInstance(MonitorManagerFactory.ManagerType.Wpf);
             else
-                viewModel._detectMonitor = viewModel.DetectMonitorMap[DetectMethod.Win32];
+                viewModel.MonitorManager = MonitorManagerFactory.GetInstance();
         }
 
         #endregion
 
-        #region Interface
-
-        public interface IDetectMonitor
-        {
-            void Detect(object param);
-        }
-
-        #endregion
-
-        #region Enum
-
-        public enum DetectMethod
-        {
-            Win32 = 0,
-            Wpf = 1
-        };
-
-        #endregion
     }
 }

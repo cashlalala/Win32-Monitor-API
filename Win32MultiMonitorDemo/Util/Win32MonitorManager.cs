@@ -24,14 +24,15 @@ namespace Win32MultiMonitorDemo.Util
 
         public Win32MonitorManager(Rect? rect = null)
         {
-            this.UpdateMonitors(rect);
+            this._monitors = new ObservableCollection<Monitor>();
+            //this.UpdateMonitors(rect);
         }
 
 #region Mehtod
         private bool EnumMonitorsCallBack(IntPtr hMonitor, IntPtr hdcMonitor, IntPtr lprcMonitor, int dwData)
         {
 // ReSharper disable RedundantThisQualifier
-            this._monitors.Add(new Win32Monitor(hMonitor, (uint) this._monitors.Count));
+            this._monitors.Add(new Win32Monitor(hMonitor, (uint)this._monitors.Count));
 // ReSharper restore RedundantThisQualifier
             return true;
         }
@@ -42,18 +43,19 @@ namespace Win32MultiMonitorDemo.Util
             IntPtr rectPtr = IntPtr.Zero;
             try
             {
+                this._monitors.Clear();
                 if (rcMonitor.HasValue)
                 {
-                    var rect = new Win32.CMonitor.RECT(
+                    var rect = new Win32Wrapper.CTypes.RECT(
                         Convert.ToInt32(rcMonitor.Value.Left), 
                         Convert.ToInt32(rcMonitor.Value.Top),
                         Convert.ToInt32(rcMonitor.Value.Right), 
                         Convert.ToInt32(rcMonitor.Value.Bottom));
-                    rectPtr = Marshal.AllocHGlobal(Marshal.SizeOf(typeof(Win32.CMonitor.RECT)));
+                    rectPtr = Marshal.AllocHGlobal(Marshal.SizeOf(typeof(Win32Wrapper.CTypes.RECT)));
                     Marshal.StructureToPtr(rect, rectPtr, true);
                 }
-                Win32.CMonitor.EnumMonitorsDelegate dg = EnumMonitorsCallBack;
-                Win32.CMonitor.EnumDisplayMonitors(IntPtr.Zero, rectPtr, dg, 0);
+                Win32Wrapper.CMonitor.EnumMonitorsDelegate dg = EnumMonitorsCallBack;
+                Win32Wrapper.CMonitor.EnumDisplayMonitors(IntPtr.Zero, rectPtr, dg, 0);
             }
             catch (Exception ex)
             {

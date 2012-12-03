@@ -1,26 +1,10 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Windows;
-using System.Windows.Controls;
-using System.Windows.Data;
-using System.Windows.Documents;
-using System.Windows.Input;
-using System.Windows.Media;
-using System.Windows.Media.Imaging;
-using System.Windows.Navigation;
-using System.Windows.Shapes;
-
-using Win32MultiMonitorDemo.Util;
-using System.Runtime.InteropServices;
 using System.ComponentModel;
-using System.Windows.Threading;
-
+using System.Windows;
 using System.Windows.Interop;
-using Win32MultiMonitorDemo.Command;
-
+using Win32MultiMonitorDemo.Util;
 using Win32MultiMonitorDemo.ViewModels;
+using log4net;
 
 namespace Win32MultiMonitorDemo
 {
@@ -29,25 +13,41 @@ namespace Win32MultiMonitorDemo
     /// </summary>
     public partial class MainWindow : Window
     {
-#region Field
-        private ViewModels.ViewModel viewModel;
+        #region Field
 
-        public ViewModels.ViewModel ViewModel
-        {
-            get { return viewModel; }
-            set { viewModel = value; }
-        }
-#endregion
+        private ViewModel ViewModel { get; set; }
+
+        //private HwndSource _hwndSource;
+
+        private static readonly ILog Logger = LogManager.GetLogger(typeof(MainWindow).Name);
+
+        #endregion
 
 #region Constructors
         public MainWindow()
         {
             InitializeComponent();
 
-            this.viewModel = new ViewModels.ViewModel(this);
+            Logger.Debug("MainWindow Init ");
+
+            this.ViewModel = new ViewModels.ViewModel(this);
             this.DataContext = ViewModel;
+
         }
 #endregion
+
+        private void MainWin_SourceUpdated(object sender, System.Windows.Data.DataTransferEventArgs e)
+        {
+            Logger.Debug("Handle Changed!!!");
+            this.ViewModel.OnHandleUpdated(sender, e);
+        }
+
+        private void MainWin_SourceInitialized(object sender, EventArgs e)
+        {
+            Logger.Debug("Handle Initialized!!!");
+            this.ViewModel.OnHandleUpdated(sender, e);
+        }
+      
 
     }
 

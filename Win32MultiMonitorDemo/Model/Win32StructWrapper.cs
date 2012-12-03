@@ -1,9 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-
-using Win32MultiMonitorDemo.Util;
+﻿using Win32MultiMonitorDemo.Util;
 using System.ComponentModel;
 using System.Reflection;
 
@@ -13,51 +8,47 @@ namespace Win32MultiMonitorDemo.Model
     {
         public class MonitorInfoEx : Win32.CMonitor.MONITORINFOEX, INotifyPropertyChanged
         {
-            public MonitorInfoEx()
-                : base()
-            {}
-
             public override int CbSize
             {
-                get { return _cbSize; }
+                get { return CbSize; }
                 set 
                 { 
-                    _cbSize = value;
+                    CbSize = value;
                     OnPropertyChanged("cbSize");
                 }
             }
 
-            public override Win32MultiMonitorDemo.Util.Win32.CMonitor.RECT rcMonitor
+            public override Win32MultiMonitorDemo.Util.Win32.CMonitor.RECT RcMonitor
             {
-                get { return _rcMonitor; }
+                get { return RcMonitor; }
                 set 
                 { 
-                    _rcMonitor = value;
+                    RcMonitor = value;
                     OnPropertyChanged("rcMonitor");
                 }
             }
 
-            public override Win32MultiMonitorDemo.Util.Win32.CMonitor.RECT rcWork
+            public override Win32MultiMonitorDemo.Util.Win32.CMonitor.RECT RcWork
             {
-                get { return _rcWork; }
+                get { return RcWork; }
                 set 
                 { 
-                    _rcWork = value;
+                    RcWork = value;
                     OnPropertyChanged("rcWork");
                 }
             }
 
-            public override int dwFlags
+            public override int DwFlags
             {
-                get { return _dwFlags; }
+                get { return DwFlags; }
                 set 
                 { 
-                    _dwFlags = value;
+                    DwFlags = value;
                     OnPropertyChanged("dwFlags");
                 }
             }
 
-            public override char[] szDevice
+            public override char[] SzDevice
             {
                 get { return _szDevice; }
                 set 
@@ -75,9 +66,9 @@ namespace Win32MultiMonitorDemo.Model
                     handler(this, new PropertyChangedEventArgs(property));
             }
 
-            public Win32MultiMonitorDemo.Util.Win32.CMonitor.MONITORINFOEX copy2Win32Struct(MonitorInfoEx monitorInfoEx)
+            public Win32.CMonitor.MONITORINFOEX Copy2Win32Struct(MonitorInfoEx monitorInfoEx)
             {
-                Win32MultiMonitorDemo.Util.Win32.CMonitor.MONITORINFOEX buf = new Win32MultiMonitorDemo.Util.Win32.CMonitor.MONITORINFOEX();
+                var buf = new Win32.CMonitor.MONITORINFOEX();
                 foreach (PropertyInfo propInfo in monitorInfoEx.GetType().GetProperties())
                 {
                     foreach (PropertyInfo propInfoInBuf in buf.GetType().GetProperties())
@@ -89,11 +80,11 @@ namespace Win32MultiMonitorDemo.Model
                 return buf;
             }
 
-            public void copyFromWin32Struct(Win32MultiMonitorDemo.Util.Win32.CMonitor.MONITORINFOEX monitorInfoEx)
+            public void CopyFromWin32Struct(Win32.CMonitor.MONITORINFOEX monitorInfoEx)
             {
                 foreach (PropertyInfo propInfo in monitorInfoEx.GetType().GetProperties())
                 {
-                    foreach (PropertyInfo propInfoSelf in this.GetType().GetProperties())
+                    foreach (PropertyInfo propInfoSelf in GetType().GetProperties())
                     {
                         if (propInfo.Name == propInfoSelf.Name)
                             propInfoSelf.SetValue(this, propInfo.GetValue(monitorInfoEx, null), null);

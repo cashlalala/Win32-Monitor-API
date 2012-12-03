@@ -1,45 +1,84 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-
+using System.Runtime.InteropServices;
+using System.Windows;
 using Win32MultiMonitorDemo.Util;
 
 namespace Win32MultiMonitorDemo.Model
 {
     public class Win32Monitor : Monitor
     {
+        private Win32Wrapper.CMonitor.MONITORINFOEX monInfoEx;
+
         public Win32Monitor()
         {}
 
         public Win32Monitor(IntPtr handle, uint index)
-            : base(handle,index)
-        {}
+            : base(handle, index)
+        {
+           monInfoEx = new Win32Wrapper.CMonitor.MONITORINFOEX();
+            if (Win32Wrapper.CMonitor.GetMonitorInfo(handle, monInfoEx))
+            {
+                MonitorRect = new Rect(
+                    monInfoEx.RcMonitor.left, monInfoEx.RcMonitor.top, 
+                    Math.Abs(monInfoEx.RcMonitor.bottom - monInfoEx.RcMonitor.top), 
+                    Math.Abs(monInfoEx.RcMonitor.right-monInfoEx.RcMonitor.left));
+                WorkRect = new Rect(
+                    monInfoEx.RcWork.left, monInfoEx.RcWork.top,
+                    Math.Abs(monInfoEx.RcWork.bottom - monInfoEx.RcWork.top),
+                    Math.Abs(monInfoEx.RcWork.right - monInfoEx.RcWork.left));
+                Name = new string(monInfoEx.SzDevice);
+            }
+            else
+            {
+                String err = String.Format("Initial Fail: {0}", Marshal.GetLastWin32Error());
+                throw new Exception(err);
+            }
+        }
 
         public override System.Windows.Rect GetMonitorRect()
         {
-            System.Windows.Rect rect = System.Windows.Rect.Empty;
-            var monInfoEx = new Win32.CMonitor.MONITORINFOEX();
-            bool succ = Win32.CMonitor.GetMonitorInfo(this.Handel, monInfoEx);
+            var rect = System.Windows.Rect.Empty;
+            bool succ = Win32Wrapper.CMonitor.GetMonitorInfo(this.Handle, monInfoEx);
             if (succ)
-                rect = new System.Windows.Rect(
-                monInfoEx.rcMonitor.left, monInfoEx.rcMonitor.top, 
-                Math.Abs(monInfoEx.rcMonitor.bottom - monInfoEx.rcMonitor.top), 
-                Math.Abs(monInfoEx.rcMonitor.right-monInfoEx.rcMonitor.left));
+            {
+                rect = new Rect(
+                    monInfoEx.RcMonitor.left, monInfoEx.RcMonitor.top, 
+                    Math.Abs(monInfoEx.RcMonitor.bottom - monInfoEx.RcMonitor.top), 
+                    Math.Abs(monInfoEx.RcMonitor.right-monInfoEx.RcMonitor.left));
+            }
             return rect;
         }
 
         public override System.Windows.Rect GetWorkAreaRect()
         {
-            System.Windows.Rect rect = System.Windows.Rect.Empty;
-            var monInfoEx = new Win32.CMonitor.MONITORINFOEX();
-            bool succ = Win32.CMonitor.GetMonitorInfo(this.Handel, monInfoEx);
+            var rect = System.Windows.Rect.Empty;
+            bool succ = Win32Wrapper.CMonitor.GetMonitorInfo(this.Handle, monInfoEx);
             if (succ)
-                rect = new System.Windows.Rect(
-                monInfoEx.rcWork.left, monInfoEx.rcWork.top,
-                Math.Abs(monInfoEx.rcWork.bottom - monInfoEx.rcWork.top),
-                Math.Abs(monInfoEx.rcWork.right - monInfoEx.rcWork.left));
+            {
+                rect = new Rect(
+                    monInfoEx.RcWork.left, monInfoEx.RcWork.top,
+                    Math.Abs(monInfoEx.RcWork.bottom - monInfoEx.RcWork.top),
+                    Math.Abs(monInfoEx.RcWork.right - monInfoEx.RcWork.left));
+            }  
             return rect;
+        }
+
+        public override void Update()
+        {
+            if (Win32Wrapper.CMonitor.GetMonitorInfo(Handle, monInfoEx))
+            {
+                WorkRect = new Rect(
+                    monInfoEx.RcWork.left, monInfoEx.RcWork.top,
+                    Math.Abs(monInfoEx.RcWork.bottom - monInfoEx.RcWork.top),
+                    Math.Abs(monInfoEx.RcWork.right - monInfoEx.RcWork.left));
+
+                MonitorRect = new Rect(
+                    monInfoEx.RcMonitor.left, monInfoEx.RcMonitor.top,
+                    Math.Abs(monInfoEx.RcMonitor.bottom - monInfoEx.RcMonitor.top),
+                    Math.Abs(monInfoEx.RcMonitor.right - monInfoEx.RcMonitor.left));
+
+                Name = new string(monInfoEx.SzDevice);
+            }
         }
     }
 }

@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Collections.ObjectModel;
 using System.Linq;
 using System.Text;
 using System.Windows;
@@ -9,21 +10,22 @@ namespace Win32MultiMonitorDemo.Util
 {
     class WpfMonitorManager : IMonitorManager
     {
+        private ObservableCollection<Monitor> _monitors;
+
         public System.Collections.ObjectModel.ObservableCollection<Monitor> Monitors
         {
-            get
-            {
-                throw new NotImplementedException();
-            }
-            set
-            {
-                throw new NotImplementedException();
-            }
+            get { return _monitors; }
+            set { _monitors = value; }
+        }
+
+        public WpfMonitorManager(Rect? rect = null)
+        {
+            this.UpdateMonitors(rect);
         }
 
         public void UpdateMonitors(Rect? rect)
         {
-            throw new NotImplementedException();
+            Console.WriteLine("QQorz");
         }
 
         public int GetCount()

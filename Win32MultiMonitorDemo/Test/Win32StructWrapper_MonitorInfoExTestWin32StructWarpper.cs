@@ -96,17 +96,17 @@ namespace Test
         {
             Win32MultiMonitorDemo.Model.Win32StructWrapper.MonitorInfoEx target = new Win32StructWrapper.MonitorInfoEx(); // TODO: Initialize to an appropriate value
             Win32StructWrapper.MonitorInfoEx monitorInfoEx = new Win32StructWrapper.MonitorInfoEx(); // TODO: Initialize to an appropriate value
-            monitorInfoEx.dwFlags = 1;
-            monitorInfoEx.rcMonitor = new Win32.MultiMonitor.RECT();
-            monitorInfoEx.rcWork = new Win32MultiMonitorDemo.Util.Win32.MultiMonitor.RECT();
-            monitorInfoEx.szDevice = new char[] { 'm','o','n','i','t','o','r','1' };
+            monitorInfoEx.DwFlags = 1;
+            monitorInfoEx.RcMonitor = new Win32.MultiMonitor.RECT();
+            monitorInfoEx.RcWork = new Win32MultiMonitorDemo.Util.Win32.MultiMonitor.RECT();
+            monitorInfoEx.SzDevice = new char[] { 'm','o','n','i','t','o','r','1' };
             Win32.MultiMonitor.MONITORINFOEX expected = new Win32.MultiMonitor.MONITORINFOEX(); // TODO: Initialize to an appropriate value
             expected.dwFlags = 1;
             expected.rcMonitor = new Win32MultiMonitorDemo.Util.Win32.MultiMonitor.RECT();
             expected.rcWork = new Win32.MultiMonitor.RECT();
             expected.szDevice = new char[] { 'm', 'o', 'n', 'i', 't', 'o', 'r', '1' };
             Win32.MultiMonitor.MONITORINFOEX actual;
-            actual = target.copy2Win32Struct(monitorInfoEx);
+            actual = target.Copy2Win32Struct(monitorInfoEx);
             Assert.AreEqual(expected, actual);
             
         }
